@@ -110,6 +110,12 @@ def save_shelters():
             json.dump(shelters, f, ensure_ascii=False, indent=2)
     except Exception:
         pass
+
+
+def refresh_shelters():
+    """保存済みの避難所データをファイルから再読み込みする"""
+    global shelters
+    shelters = load_json(DATA_FILE, [])
 # ────────────────────────────────
 
 # ────────────────────────────────
@@ -318,12 +324,21 @@ def shelter_register():
 # 避難所検索ページ
 @app.route('/shelter_search')
 def shelter_search():
-    return render_template('shelter_search.html')
+    refresh_shelters()
+    return render_template(
+        'shelter_search.html',
+        refreshed_at=get_japan_time()
+    )
 
 # 全施設一覧ページ
 @app.route('/all_shelters')
 def all_shelters():
-    return render_template('search_results.html', results=shelters)
+    refresh_shelters()
+    return render_template(
+        'search_results.html',
+        results=shelters,
+        refreshed_at=get_japan_time()
+    )
 
 
 # 指示ボード：住民向けの指示を一覧で確認する
@@ -336,12 +351,18 @@ def board():
 # 検索結果ページ：templates/search_results.html を返す
 @app.route('/search_results')
 def search_results():
+    refresh_shelters()
     results = filter_shelters(request.args.get('district'))
-    return render_template('search_results.html', results=results)
+    return render_template(
+        'search_results.html',
+        results=results,
+        refreshed_at=get_japan_time()
+    )
 
 # JSON API：/shelters?district=地区名
 @app.route('/shelters', methods=['GET'])
 def get_shelters():
+    refresh_shelters()
     results = filter_shelters(request.args.get('district'))
 
     if not results:
