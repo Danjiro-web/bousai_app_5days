@@ -1,7 +1,53 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h2>避難所検索</h2>
+<style>
+  .search-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+
+  .search-header h2 {
+    margin: 0;
+  }
+
+  .search-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .refresh-time {
+    font-size: 0.95rem;
+    color: #4f5f6b;
+    white-space: nowrap;
+  }
+
+  .refresh-button {
+    display: inline-block;
+    padding: 8px 14px;
+    border-radius: 8px;
+    border: 1px solid #0b4d82;
+    background: #0b4d82;
+    color: #fff;
+    text-decoration: none;
+    font-weight: 700;
+  }
+</style>
+
+<div class="search-header">
+  <h2>避難所検索</h2>
+
+  <div class="search-actions">
+    <span class="refresh-time">更新日時: {{ refreshed_at or '取得中...' }}</span>
+    <a class="refresh-button" href="/shelter_search">最新情報に更新</a>
+  </div>
+</div>
+
 <p>登録されている避難所を確認できます。</p>
 
 <p><a href="/all_shelters">全施設一覧</a></p>
