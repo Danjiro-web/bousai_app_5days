@@ -4,31 +4,170 @@
   <meta charset="utf-8">
   <title>{% block title %}防災アプリ{% endblock %}</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    :root {
+      --header-blue: #0b4d82;
+      --page-bg: #edf1f4;
+      --panel-bg: #edf1f4;
+      --panel-border: rgba(48, 81, 112, 0.12);
+      --text-main: #1d2c36;
+      --text-sub: #5d6d79;
+      --success: #2bb673;
+      --button-green: #15a56a;
+      --button-green-dark: #0d8d5d;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: "Yu Gothic", "Hiragino Sans", "Meiryo", sans-serif;
+      background: var(--page-bg);
+      color: var(--text-main);
+    }
+
+    .topbar {
+      position: relative;
+      z-index: 1000;
+      background: var(--header-blue);
+      height: 82px;
+      box-shadow: 0 1px 0 rgba(0, 0, 0, 0.08);
+    }
+
+    .topbar-inner {
+      position: relative;
+      max-width: 1280px;
+      height: 100%;
+      margin: 0 auto;
+      padding: 0 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .topbar h1 {
+      margin: 0;
+      font-size: 2.2rem;
+      line-height: 1;
+      font-weight: 800;
+      color: #f2f6fb;
+      letter-spacing: 0.04em;
+    }
+
+    .menu-button {
+      width: 42px;
+      height: 42px;
+      border: 0;
+      background: transparent;
+      padding: 0;
+      cursor: pointer;
+      display: inline-flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 5px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .menu-button span {
+      display: block;
+      width: 24px;
+      height: 3px;
+      border-radius: 2px;
+      background: rgba(255,255,255,0.96);
+    }
+
+    .menu-panel {
+      position: absolute;
+      right: 28px;
+      top: 72px;
+      display: none;
+      min-width: 220px;
+      background: rgba(255, 255, 255, 0.98);
+      border: 1px solid rgba(11, 77, 130, 0.18);
+      border-radius: 10px;
+      box-shadow: 0 14px 32px rgba(27, 54, 77, 0.18);
+      padding: 8px;
+      z-index: 10;
+    }
+
+    .menu-panel.open {
+      display: block;
+    }
+
+    .menu-panel a {
+      display: block;
+      padding: 10px 12px;
+      border-radius: 8px;
+      color: var(--text-main);
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .menu-panel a:hover {
+      background: #edf5ff;
+      color: var(--header-blue);
+    }
+
+    main {
+      position: relative;
+      z-index: 1;
+      max-width: 980px;
+      margin: 32px auto 48px;
+      padding: 0 16px;
+    }
+  </style>
 </head>
 <body>
-  <!-- ヘッダー -->
-  <h1>防災アプリ</h1>
-
-  <!-- ナビゲーション -->
-  <nav>
-    <a href="/">ホーム</a> |
-    <a href="/shelter_search">避難所検索</a> |
-    <a href="/shelter_register">避難所登録</a> |
-    <a href="/board">指示・発信ボード</a>
-    ｜
-    {% if session.logged_in %}
-      ログイン中{% if session.username %}（{{ session.username }}）{% endif %}
-      <a href="/logout">ログアウト</a>
-    {% else %}
-      未ログイン
-      <a href="/login">ログイン</a>
-    {% endif %}
-  </nav>
-  <hr>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <h1>防災アプリ</h1>
+      <button class="menu-button" aria-label="メニュー" aria-expanded="false" type="button">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+      <nav class="menu-panel" id="menu-panel" aria-label="メインメニュー">
+        <a href="/">ホーム</a>
+        <a href="/shelter_search">避難所検索</a>
+        <a href="/shelter_register">避難所登録</a>
+        <a href="/board">指示・発信ボード</a>
+        {% if session.logged_in %}
+          <a href="/logout">ログアウト</a>
+        {% else %}
+          <a href="/login">ログイン</a>
+        {% endif %}
+      </nav>
+    </div>
+  </header>
 
   <main>
-    <!-- ここに子テンプレートの content が入る -->
     {% block content %}{% endblock %}
   </main>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const button = document.querySelector('.menu-button');
+      const panel = document.getElementById('menu-panel');
+
+      if (!button || !panel) {
+        return;
+      }
+
+      button.addEventListener('click', function () {
+        const isOpen = panel.classList.toggle('open');
+        button.setAttribute('aria-expanded', String(isOpen));
+      });
+
+      document.addEventListener('click', function (event) {
+        const target = event.target;
+        if (!panel.contains(target) && !button.contains(target)) {
+          panel.classList.remove('open');
+          button.setAttribute('aria-expanded', 'false');
+        }
+      });
+    });
+  </script>
 </body>
 </html>
